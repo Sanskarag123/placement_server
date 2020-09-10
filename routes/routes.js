@@ -1,6 +1,6 @@
 // Routes File
 let express = require('express');
-const { BlobServiceClient } = require('@azure/storage-blob');
+
 const bcrypt = require('bcrypt');
 let router = express.Router();
 let constants = require('../constants/constant')
@@ -15,7 +15,7 @@ let token = require('../services/token')
 const {json} = require('body-parser');
 const {createToken, verifyToken} = require('../services/token');
 const {connection} = require('mongoose');
-let BaseURL = 'http://localhost:3000/files/';
+let BaseURL = 'http://localhost:4000/files/';
 let saltRounds = 10;
 let education = {
     school :{
@@ -55,15 +55,7 @@ let education = {
 
     }
 }
-const
-    inMemoryStorage = multer.memoryStorage()
-    , uploadStrategy = multer({ storage: inMemoryStorage }).single('image')
 
-    , azureStorage = require('azure-storage')
-    , blobService = azureStorage.createBlobService()
-
-    , getStream = require('into-stream')
-    , containerName = 'images'
 // Verify Authorization
 let VerifyAuth = async function (req) {
 
@@ -323,7 +315,7 @@ router.get("/userdetail/get", (req,res) => {
         if (registrationNumber) {
             
             studentDb.then(model => {
-              model.findOne({registrationNumber:registrationNumber},{name:1,faculty:1,email:1,registrationNumber:1,number:1,CGPA:1}).then( data => {
+              model.findOne({registrationNumber:registrationNumber},{name:1,faculty:1,email:1,registrationNumber:1,number:1,CGPA:1,profile_url:1}).then( data => {
                   if (data != {}) 
                     res.send(data);
               }).catch( err => {
@@ -409,7 +401,7 @@ router.post('/collegeducation/update', (req, res) => {
 router.post("/file/upload",upload.single('certificates'), (req,res) => {
  
 
-      
+      console.log(req.body);
        
            res.send({fileurl:BaseURL+req.file.originalname});
 
