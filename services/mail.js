@@ -9,7 +9,7 @@ let transport = nodemailer.createTransport({
       pass: '!@#$%^&*sanskar123', // generated ethereal password
     },
 });
-let baseURL = "http://localhost:4200/student/register/";
+let baseURL = "https://placement-portal-9c359.web.app/student/register/";
 sendEmail = async (email, token) => {
   return await transport.sendMail({
     from: 'PlacementPortal', // sender address

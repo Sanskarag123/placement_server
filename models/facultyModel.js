@@ -4,7 +4,12 @@ let moongoose = require('mongoose')
 const schema = moongoose.Schema({
     email:String,
     password:String,
-    facultyID:String,
+    facultyId:String,
+    number:String,
+    totalstudents:Number,
+    name:String,
+    
+
 
 })
 

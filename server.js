@@ -6,6 +6,7 @@ const routes = require('./routes/routes');
 const cors = require("cors");
 const { static } = require('express');
 const app = express();
+app.set("view engine", "pug");
 
 app.use(cors())
 app.use(bodyParser.json());
@@ -16,11 +17,10 @@ app.use(
         extended: false
     })
 )
+app.use('/', express.static('dist/Placement-portal'));
 app.use('/files',express.static('uploads'));
 
-app.get('/',function(req,res){
-    res.send('connected to Server')
-})
+
 
 
 app.listen(process.env.PORT,()=> {
