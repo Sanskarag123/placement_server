@@ -307,7 +307,7 @@ router.post('/collegescholl/update', (req, res) => {
     })
 })
 //Get userPersonadetails
-router.get("/userdetail/get", (req,res) => {
+router.get("/userdetail/get", (req,res) => {    
 
     VerifyAuth(req).then((reg_no) => {
         registrationNumber = reg_no;
@@ -315,7 +315,7 @@ router.get("/userdetail/get", (req,res) => {
         if (registrationNumber) {
             
             studentDb.then(model => {
-              model.findOne({registrationNumber:registrationNumber},{name:1,faculty:1,email:1,registrationNumber:1,number:1,CGPA:1,profile_url:1}).then( data => {
+              model.findOne({registrationNumber:registrationNumber},{name:1,faculty:1,email:1,registrationNumber:1,number:1,CGPA:1,profile_url:1,dob:1,section:1,specilization:1,gender:1,dept:1}).then( data => {
                   if (data != {}) 
                     res.send(data);
               }).catch( err => {
@@ -492,8 +492,9 @@ router.post("/file/upload",upload.single(), (req,res) => {
             registrationNumber = reg_no;
             if (registrationNumber) {
                 studentDb.then(model => {
-                  model.findOne({registrationNumber:registrationNumber},{educationDetails:1}).then( data => {
-                    res.send(data.educationDetails);
+                  model.findOne({registrationNumber:registrationNumber},{educationDetails:1,arrears:1,standingarrears:1}).then( data => {
+                    let senddata = {...data.educationDetails,arrears:data.arrears,standingarrears:data.standingarrears}
+                    res.send(senddata);
                   }).catch( err => {
                     res.status(403).send({message: 'Database Error'});
                   })
@@ -505,7 +506,28 @@ router.post("/file/upload",upload.single(), (req,res) => {
         }).catch(e => {
             res.status(401).send({message: 'Authentication Failed'});
         })
-    })
+    });
+    router.get("/achievements/get", (req,res) => {
+    
+        VerifyAuth(req).then((reg_no) => {
+            registrationNumber = reg_no;
+            if (registrationNumber) {
+                studentDb.then(model => {
+                  model.findOne({registrationNumber:registrationNumber},{achivements:1}).then( data => {
+                    let senddata = {...data.achivements}
+                    res.send(senddata);
+                  }).catch( err => {
+                    res.status(403).send({message: 'Database Error'});
+                  })
+                })
+    
+            } else {
+                res.status(401).send({message: 'Authentication Failed1'});
+            }
+        }).catch(e => {
+            res.status(401).send({message: 'Authentication Failed'});
+        })
+    });
     router.post('/courses/add', (req, res) => {
         let userData = req.body;
         VerifyAuth(req).then((reg_no) => {
@@ -517,6 +539,36 @@ router.post("/file/upload",upload.single(), (req,res) => {
                     }, {
                         $push: {
                             'certificationDetails.courses': userData
+                        }
+                    }).then((value) => {
+                        if (value.nModified == 1) {
+                            res.send({message: 'Update Successfull'})
+                        } else {
+                            res.status(403).send({message: 'Update Failed'})
+                        }
+                    }).catch(e => {
+                        res.status(401).send({message: 'email not found'});
+                    })
+                })
+    
+            } else {
+                res.status(401).send({message: 'Authentication Failed1'});
+            }
+        }).catch(e => {
+            res.status(401).send({message: 'Authentication Failed'});
+        })
+    })
+    router.post('/projects/add', (req, res) => {
+        let userData = req.body;
+        VerifyAuth(req).then((reg_no) => {
+            registrationNumber = reg_no;
+            if (registrationNumber) {
+                studentDb.then(model => {
+                    model.updateOne({
+                        registrationNumber: registrationNumber
+                    }, {
+                        $push: {
+                            'achivements.project': userData
                         }
                     }).then((value) => {
                         if (value.nModified == 1) {
@@ -826,7 +878,7 @@ router.post('/faculty/register', (req, res) => {
 router.post("/facultystudent/get", (req,res) => {
     
             studentDb.then(model => {
-              model.aggregate([{$match:{facultyId:req.body.facultyId}},{$project:{name:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1}}]).then( data => {
+              model.aggregate([{$match:{facultyId:req.body.facultyId}},{$project:{name:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1}}]).then( data => {
                   if (data != {}) 
                     res.send(data);
               }).catch( err => {

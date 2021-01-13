@@ -11,8 +11,21 @@ const schema = moongoose.Schema({
     acad:String,
     date:String,
     profile_url:String,
+    speciliztion:String,
+    nri:Boolean,
+    dob:String,
+    gender:String,
+    section:String,
     dept:String,
     number:Number,
+    arrears:Number,
+    standingarrears:Number,
+ achivements:{
+     project:Array,
+     hackathons:Array,
+     codingcontests:Array,
+     otherachievements:Array
+ },
     personalDetails:{
         address:String,
     },
@@ -58,7 +71,7 @@ const schema = moongoose.Schema({
         courses:[Object],
         workshops:[Object]
     },
-    placementDetails:[{name:String,status:String,verified:{type:String,default:"pending"}}],
+    placementDetails:[{company:String,status:String,verified:{type:String,default:"pending"}}],
     skills:[{name:String}],
     CGPA:{type:String,default:'0'}
 

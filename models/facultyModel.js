@@ -8,9 +8,6 @@ const schema = moongoose.Schema({
     number:String,
     totalstudents:Number,
     name:String,
-    
-
-
 })
 
 module.exports = schema
