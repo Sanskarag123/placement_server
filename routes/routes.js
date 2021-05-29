@@ -319,7 +319,7 @@ router.get("/userdetail/get", (req,res) => {
         
         if (registrationNumber) {
             studentDb.then(model => {
-              model.aggregate([{$match:{registrationNumber:registrationNumber}},{$project:{name:1,registrationNumber:1,number:1,CGPA:1,profile_url:1,dob:1,section:1,specilization:1,gender:1,dept:1,email:1,"internships":{$size:"$certificationDetails.internships"},"XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1,"placements":{$size:"$placementDetails"},"certifications":{$size:"$certificationDetails.intcertifications"}}}]).then( data => {
+              model.aggregate([{$match:{registrationNumber:registrationNumber}},{$project:{name:1,registrationNumber:1,number:1,CGPA:1,profile_url:1,dob:1,section:1,specilization:1,gender:1,dept:1,email:1,"internships":{$size:"$certificationDetails.internships"},CGPA:1,arrears:1,gender:1,achivements:{$sum:[{$size:"$achivements.project"},{$size:"$achivements.hackathons"},{$size:"$achivements.codingcontests"}]},"placements":{$size:"$placementDetails"},"certifications":{$size:"$certificationDetails.intcertifications"}}}]).then( data => {
                   if (data != {}) 
                     res.send(data[0]);
               }).catch( err => {
