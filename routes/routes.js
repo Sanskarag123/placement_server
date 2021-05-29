@@ -31,29 +31,7 @@ let education = {
             verified:"",
         }
     },
-    college:{
-        one:{
-            percentage:"null",
-            url:"",
-            verified:"",
-        },
-        two:{
-            percentage:"null",
-            url:"",
-            verified:"",
-        },
-        three:{
-            percentage:"null",
-            url:"",
-            verified:"",
-        },
-        four:{
-            percentage:"null",
-            url:"",
-            verified:"",
-        },
-
-    }
+    college:[]
 }
 
 // Verify Authorization
@@ -323,7 +301,7 @@ router.get("/userdetail/get", (req,res) => {
         
         if (registrationNumber) {
             studentDb.then(model => {
-              model.aggregate([{$match:{registrationNumber:registrationNumber}},{$project:{name:1,registrationNumber:1,number:1,CGPA:1,profile_url:1,dob:1,section:1,faculty:1,specilization:1,gender:1,dept:1,email:1,"internships":{$size:"$certificationDetails.internships"},CGPA:1,arrears:1,gender:1,personalemail:1,achivements:{$sum:[ { $cond: { if: { $isArray: "$achivements.project" }, then: { $size: "$achivements.project" }, else: "NA"} },{ $cond: { if: { $isArray: "$achivements.hackathons" }, then: { $size: "$achivements.hackathons" }, else: "NA"} },{ $cond: { if: { $isArray: "$achivements.codingcontests" }, then: { $size: "$achivements.codingcontests" }, else: "NA"} }]},"placements":{ $cond: { if: { $isArray: "$placementDetails" }, then: { $size: "$placementDetails" }, else: "NA"} },"certifications":{ $cond: { if: { $isArray: "$certificationDetails.incertifications" }, then: { $size: "$certificationDetails.incertifications" }, else: "NA"} }}}]).then( data => {
+              model.aggregate([{$match:{registrationNumber:registrationNumber}},{$project:{name:1,registrationNumber:1,number:1,CGPA:1,profile_url:1,dob:1,section:1,faculty:1,specilization:1,gender:1,dept:1,email:1,"internships":{$size:"$certificationDetails.internships"},CGPA:1,arrears:1,gender:1,personalemail:1,achivements:{$sum:[ { $cond: { if: { $isArray: "$achivements.project" }, then: { $size: "$achivements.project" }, else: 0} },{ $cond: { if: { $isArray: "$achivements.hackathons" }, then: { $size: "$achivements.hackathons" }, else: 0} },{ $cond: { if: { $isArray: "$achivements.codingcontests" }, then: { $size: "$achivements.codingcontests" }, else: 0} }]},"placements":{ $cond: { if: { $isArray: "$placementDetails" }, then: { $size: "$placementDetails" }, else: 0} },"certifications":{ $cond: { if: { $isArray: "$certificationDetails.incertifications" }, then: { $size: "$certificationDetails.incertifications" }, else: 0} }}}]).then( data => {
                   if (data != {}) 
                     res.send(data[0]);
               }).catch( err => {
@@ -539,6 +517,39 @@ router.post("/file/upload",upload.single(), (req,res) => {
             res.status(401).send({message: 'Authentication Failed'});
         })
     });
+        router.post('/semcgpa/add', (req, res) => {
+        let userData = req.body;
+        userData.verified = "pending";
+        VerifyAuth(req).then((reg_no) => {
+            registrationNumber = reg_no;
+            if (registrationNumber) {
+                studentDb.then(model => {
+                    console.log(userData,'yo')
+                    model.updateOne({
+                        registrationNumber: registrationNumber
+                    }, {
+                        $push: {
+                            'educationDetails.college': userData
+                        }
+                    }).then((value) => {
+                        console.log(value);
+                        if (value.nModified == 1) {
+                            res.send({message: 'Update Successfull'})
+                        } else {
+                            res.status(403).send({message: 'Update Failed'})
+                        }
+                    }).catch(e => {
+                        res.status(401).send({message: 'email not found'});
+                    })
+                })
+    
+            } else {
+                res.status(401).send({message: 'Authentication Failed1'});
+            }
+        }).catch(e => {
+            res.status(401).send({message: 'Authentication Failed'});
+        })
+    })
     router.post('/courses/add', (req, res) => {
         let userData = req.body;
         VerifyAuth(req).then((reg_no) => {
@@ -631,6 +642,39 @@ router.post("/file/upload",upload.single(), (req,res) => {
             res.status(401).send({message: 'Authentication Failed'});
         })
     })
+ router.post('/codingcontests/add', (req, res) => {
+        let userData = req.body;
+        VerifyAuth(req).then((reg_no) => {
+            registrationNumber = reg_no;
+            console.log(reg_no);
+            if (registrationNumber) {
+                console.log(registrationNumber)
+                studentDb.then(model => {
+                    model.updateOne({
+                        registrationNumber: registrationNumber
+                    }, {
+                        $push: {
+                            'achivements.codingcontests': userData
+                        }
+                    }).then((value) => {
+                        if (value.nModified == 1) {
+                            res.send({message: 'Update Successfull'})
+                        } else {
+                            res.status(403).send({message: 'Update Failed'})
+                        }
+                    }).catch(e => {
+                        res.status(401).send({message: 'email not found'});
+                    })
+                })
+    
+            } else {
+                res.status(401).send({message: 'Authentication Failed1'});
+            }
+        }).catch(e => {
+            res.status(401).send({message: 'Authentication Failed'});
+        })
+    })
+
         router.post('/hackathons/add', (req, res) => {
         let userData = req.body;
         VerifyAuth(req).then((reg_no) => {
@@ -946,20 +990,79 @@ router.post('/faculty/register', (req, res) => {
         })
     
     })
-
-
-
-
-router.post("/facultystudent/get", (req,res) => {
-    
+    router.post("/facultystudent/search", (req,res) => {
+           
+            
+            
             studentDb.then(model => {
-              model.aggregate([{$match:{facultyId:req.body.facultyId,verified:true}},{$project:{name:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1}}]).then( data => {
+              model.find({registrationNumber:"RA1811032010051"}).then( data => {
                   if (data != {}) 
                     res.send(data);
               }).catch( err => {
                 res.status(403).send({message: 'Database Error'});
               })
             })
+           
+})
+
+
+
+
+router.post("/facultystudent/get/:type", (req,res) => {
+            let type = req.params.type;
+            let att = req.query.att;
+            console.log(att,type);
+            let order = type=='asc'?1:-1;
+            
+            if(att=='CGPA'){
+            studentDb.then(model => {
+              model.aggregate([{$match:{facultyId:req.body.facultyId,verified:true}},{$project:{name:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1}},{$sort:{CGPA:order}}]).then( data => {
+                  if (data != {}) 
+                    res.send(data);
+              }).catch( err => {
+                res.status(403).send({message: 'Database Error'});
+              })
+            })}
+            if(att=='X'){
+                studentDb.then(model => {
+              model.aggregate([{$match:{facultyId:req.body.facultyId,verified:true}},{$project:{name:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1}},{$sort:{X:order}}]).then( data => {
+                  if (data != {}) 
+                    res.send(data);
+              }).catch( err => {
+                res.status(403).send({message: 'Database Error'});
+              })
+            })
+            }
+            if(att=='XII'){
+                studentDb.then(model => {
+              model.aggregate([{$match:{facultyId:req.body.facultyId,verified:true}},{$project:{name:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1}},{$sort:{XII:order}}]).then( data => {
+                  if (data != {}) 
+                    res.send(data);
+              }).catch( err => {
+                res.status(403).send({message: 'Database Error'});
+              })
+            })
+            }
+            if(att=='male'){
+                studentDb.then(model => {
+              model.aggregate([{$match:{facultyId:req.body.facultyId,verified:true,gender:'male'}},{$project:{name:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1}},{$sort:{X:order}}]).then( data => {
+                  if (data != {}) 
+                    res.send(data);
+              }).catch( err => {
+                res.status(403).send({message: 'Database Error'});
+              })
+            })
+            }
+             if(att=='female'){
+                studentDb.then(model => {
+              model.aggregate([{$match:{facultyId:req.body.facultyId,verified:true,gender:'female'}},{$project:{name:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1}},{$sort:{X:order}}]).then( data => {
+                  if (data != {}) 
+                    res.send(data);
+              }).catch( err => {
+                res.status(403).send({message: 'Database Error'});
+              })
+            })
+            }
 })
 router.post("/registered/get", (req,res) => {
     

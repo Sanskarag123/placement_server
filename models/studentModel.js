@@ -44,29 +44,8 @@ const schema = moongoose.Schema({
                 verified:String,
             }
         },
-        college:{
-            one:{
-                percentage:String,
-                url:String,
-                verified:String,
-            },
-            two:{
-                percentage:String,
-                url:String,
-                verified:String,
-            },
-            three:{
-                percentage:String,
-                url:String,
-                verified:String,
-            },
-            four:{
-                percentage:String,
-                url:String,
-                verified:String,
-            },
-
-        }
+        college:[
+            Object]
     },
     certificationDetails: {
         courses:[Object],
@@ -74,7 +53,7 @@ const schema = moongoose.Schema({
         intcertifications:[Object],
         internships:[Object]
     },
-    placementDetails:[{company:String,status:String,verified:{type:String,default:"pending"},startdate:String}],
+    placementDetails:[{company:String,status:String,verified:{type:String,default:"pending"},startdate:String,position:String}],
     skills:[Object],
     CGPA:{type:String,default:'0'}
 
