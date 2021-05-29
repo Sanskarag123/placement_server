@@ -6,7 +6,7 @@ let createToken = function(id, user) {
 let verifyToken =async function (token)  {
     let email;
     let user;
-    console.log(email);
+    console.log(token   );
     await jwt.verify(token,process.env.key, (err, decode) => {
         email = decode.key;
         console.log(email);

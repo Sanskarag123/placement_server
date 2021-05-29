@@ -62,10 +62,12 @@ let VerifyAuth = async function (req) {
     try {
         let token_code = req.get('Authorization').split(' ')[1];
         return await token.verifyToken(token_code).then(async (value) => {
+            console.log(token_code);
             return await studentDb.then(model => {
                 return model.find({registrationNumber: value.registrationNumber}).then((data) => {
                     if (data) {
-                        return value.registrationNumber;;
+                        console.log(data);
+                        return value.registrationNumber;
                     } else {
                         return false;
                     }
@@ -110,7 +112,7 @@ router.post('/students/register', (req, res) => {
                         bcrypt.hash(credentials.password, salt, (err, hash) => {
                             credentials.password = hash;
                             credentials.verified = false;
-                            credentials.educationDetails =  education;
+                            
                             studentDb.then(model_1 => {
                                 console.log(credentials);
                                 model_1(credentials).save().then( check => {
@@ -146,14 +148,15 @@ router.post('/students/register', (req, res) => {
 })
 
 // email Verify 
-router.post('/verifyemail', (req, res) => {
-     let token = req.body.token;
+router.get('/verifyemail/:token', (req, res) => {
+     let token = req.params.token;
      
      verifyToken(token).then( check => {
           studentDb.then( model => {
                
                model.updateOne({registrationNumber:check.registrationNumber},{$set:{verified:true}}).then( modify => {
                     if(modify.nModified == 1 || modify.n== 1) {
+                        res.redirect('http://localhost:3000');
                          res.send({message:'verified'})
                     } else {
                          res.status(403).send({message:'Not verified'})
@@ -250,18 +253,19 @@ router.post('/userdetail/update', (req, res) => {
 })
 router.post('/skills/update', (req, res) => {
     let userData = req.body;
-   
-  
+   let mydata = req.body;
+  console.log(userData)
     VerifyAuth(req).then((reg_no) => {
         registrationNumber = reg_no;
         if (registrationNumber) {
             
             studentDb.then(model => {
+                console.log(mydata,"yoyo");
                 model.updateOne({
                     registrationNumber: registrationNumber
                 }, {
                     $push: {
-                        skills: userData
+                        skills: mydata
                     }
                 }).then((value) => {
                     if (value.nModified == 1) {
@@ -319,10 +323,11 @@ router.get("/userdetail/get", (req,res) => {
         
         if (registrationNumber) {
             studentDb.then(model => {
-              model.aggregate([{$match:{registrationNumber:registrationNumber}},{$project:{name:1,registrationNumber:1,number:1,CGPA:1,profile_url:1,dob:1,section:1,specilization:1,gender:1,dept:1,email:1,"internships":{$size:"$certificationDetails.internships"},CGPA:1,arrears:1,gender:1,achivements:{$sum:[{$size:"$achivements.project"},{$size:"$achivements.hackathons"},{$size:"$achivements.codingcontests"}]},"placements":{$size:"$placementDetails"},"certifications":{$size:"$certificationDetails.intcertifications"}}}]).then( data => {
+              model.aggregate([{$match:{registrationNumber:registrationNumber}},{$project:{name:1,registrationNumber:1,number:1,CGPA:1,profile_url:1,dob:1,section:1,faculty:1,specilization:1,gender:1,dept:1,email:1,"internships":{$size:"$certificationDetails.internships"},CGPA:1,arrears:1,gender:1,personalemail:1,achivements:{$sum:[ { $cond: { if: { $isArray: "$achivements.project" }, then: { $size: "$achivements.project" }, else: "NA"} },{ $cond: { if: { $isArray: "$achivements.hackathons" }, then: { $size: "$achivements.hackathons" }, else: "NA"} },{ $cond: { if: { $isArray: "$achivements.codingcontests" }, then: { $size: "$achivements.codingcontests" }, else: "NA"} }]},"placements":{ $cond: { if: { $isArray: "$placementDetails" }, then: { $size: "$placementDetails" }, else: "NA"} },"certifications":{ $cond: { if: { $isArray: "$certificationDetails.incertifications" }, then: { $size: "$certificationDetails.incertifications" }, else: "NA"} }}}]).then( data => {
                   if (data != {}) 
                     res.send(data[0]);
               }).catch( err => {
+                  console.log(err);
                 res.status(403).send({message: 'Database Error'});
               })
             })
@@ -540,13 +545,15 @@ router.post("/file/upload",upload.single(), (req,res) => {
             registrationNumber = reg_no;
             if (registrationNumber) {
                 studentDb.then(model => {
+                    console.log(userData,'yo')
                     model.updateOne({
                         registrationNumber: registrationNumber
                     }, {
                         $push: {
-                            'certificationDetails.intcerifications': userData
+                            'certificationDetails.intcertifications': userData
                         }
                     }).then((value) => {
+                        console.log(value);
                         if (value.nModified == 1) {
                             res.send({message: 'Update Successfull'})
                         } else {
@@ -628,7 +635,9 @@ router.post("/file/upload",upload.single(), (req,res) => {
         let userData = req.body;
         VerifyAuth(req).then((reg_no) => {
             registrationNumber = reg_no;
+            console.log(reg_no);
             if (registrationNumber) {
+                console.log(registrationNumber)
                 studentDb.then(model => {
                     model.updateOne({
                         registrationNumber: registrationNumber

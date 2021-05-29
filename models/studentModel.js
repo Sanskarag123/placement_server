@@ -10,10 +10,11 @@ const schema = moongoose.Schema({
     facultyId:{type:String,default:"102253"},
     acad:String,
     date:String,
-    profile_url:String,
-    speciliztion:String,
-    nri:Boolean,
-    dob:String,
+    profile_url:{type:String,default:""},
+    specilization:String,
+    nri:{type:Boolean,default:false},
+    dob:{type:String,default:''},
+    personalemail:String,
     gender:String,
     section:String,
     dept:String,
@@ -21,7 +22,7 @@ const schema = moongoose.Schema({
     arrears:Number,
     standingarrears:Number,
  achivements:{
-     project:Array,
+     project:{type:Array},
      hackathons:Array,
      codingcontests:Array,
      otherachievements:Array
@@ -69,10 +70,12 @@ const schema = moongoose.Schema({
     },
     certificationDetails: {
         courses:[Object],
-        workshops:[Object]
+        workshops:[Object],
+        intcertifications:[Object],
+        internships:[Object]
     },
-    placementDetails:[{company:String,status:String,verified:{type:String,default:"pending"}}],
-    skills:[{name:String}],
+    placementDetails:[{company:String,status:String,verified:{type:String,default:"pending"},startdate:String}],
+    skills:[Object],
     CGPA:{type:String,default:'0'}
 
 })
