@@ -35,13 +35,13 @@ const schema = moongoose.Schema({
             X:{
                 percentage:String,
                 url:String,
-                verified:String,
+                verified:{type:String,default:"pending"},
 
             },
             XII:{
                 percentage:String,
                 url:String,
-                verified:String,
+                verified:{type:String,default:"pending"}
             }
         },
         college:[

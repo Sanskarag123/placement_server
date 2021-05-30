@@ -16,6 +16,7 @@ const {json} = require('body-parser');
 const {createToken, verifyToken} = require('../services/token');
 const {connection} = require('mongoose');
 let BaseURL = 'http://localhost:4000/files/';
+const upload1 = require('./../services/firebaseAdmin');
 let saltRounds = 10;
 let education = {
     school :{
@@ -427,7 +428,7 @@ router.post("/file/upload",upload.single('certificates'), (req,res) => {
  
 
       console.log(req.body);
-       
+        upload1();
            res.send({fileurl:BaseURL+req.file.originalname});
 
        
@@ -1159,7 +1160,7 @@ router.post("/placementverify/get", (req,res) => {
 router.post("/collegesem/get", (req,res) => {
    
             studentDb.then(model => {
-              model.aggregate([{$match:{facultyId:req.body.facultyId}},{$project:{name:1,reg:'$registrationNumber'  ,college:'$educationDetails.college'}}]).then( data => {
+              model.aggregate([{$match:{facultyId:req.body.facultyId,"educationDetails.college.verified":"pending"}},{$project:{name:1,reg:'$registrationNumber'  ,college:'$educationDetails.college'}}]).then( data => {
                   if (data != {}) 
                     res.send(data);
               }).catch( err => {
@@ -1282,19 +1283,11 @@ router.post("/college/verify", (req,res) => {
     
     let sem;
  
-    if(req.body.sem == 1  )
-        sem = 'educationDetails.college.one.verified'
-        if(req.body.sem == 2  )
-        sem =  'educationDetails.college.two.verified'
-        if(req.body.sem == 3  )
-        sem ='educationDetails.college.three.verified'
-        if(req.body.sem == 4  )
-        sem = 'educationDetails.college.four.verified'
   
- 
+ console.log(req.body,"yes");
   
             studentDb.then(model => {
-              model.updateOne({facultyId:req.body.facultyId,registrationNumber:req.body.reg},{[sem]:req.body.response}).then( data => {
+              model.updateOne({facultyId:req.body.facultyId,registrationNumber:req.body.reg,"educationDetails.college.sem":req.body.sem},{$set:{"educationDetails.college.$.verified":req.body.response}}).then( data => {
                   if(data.nModified == 1)
                   res.send({message:"Update Successfull"})
               }).catch( err => {
