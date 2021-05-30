@@ -338,7 +338,7 @@ router.get("/userdetail/get", (req,res) => {
         
         if (registrationNumber) {
             studentDb.then(model => {
-              model.aggregate([{$match:{registrationNumber:registrationNumber}},{$project:{name:1,registrationNumber:1,number:1,CGPA:1,profile_url:1,dob:1,section:1,faculty:1,specilization:1,gender:1,dept:1,email:1,"internships":{$size:"$certificationDetails.internships"},CGPA:1,arrears:1,gender:1,personalemail:1,achivements:{$sum:[ { $cond: { if: { $isArray: "$achivements.project" }, then: { $size: "$achivements.project" }, else: 0} },{ $cond: { if: { $isArray: "$achivements.hackathons" }, then: { $size: "$achivements.hackathons" }, else: 0} },{ $cond: { if: { $isArray: "$achivements.codingcontests" }, then: { $size: "$achivements.codingcontests" }, else: 0} }]},"placements":{ $cond: { if: { $isArray: "$placementDetails" }, then: { $size: "$placementDetails" }, else: 0} },"certifications":{ $cond: { if: { $isArray: "$certificationDetails.incertifications" }, then: { $size: "$certificationDetails.incertifications" }, else: 0} }}}]).then( data => {
+              model.aggregate([{$match:{registrationNumber:registrationNumber}},{$project:{name:1,registrationNumber:1,number:1,CGPA:1,profile_url:1,dob:1,section:1,faculty:1,specilization:1,gender:1,dept:1,email:1,"internships":{$size:"$certificationDetails.internships"},CGPA:1,arrears:1,gender:1,photograph:1,personalemail:1,achivements:{$sum:[ { $cond: { if: { $isArray: "$achivements.project" }, then: { $size: "$achivements.project" }, else: 0} },{ $cond: { if: { $isArray: "$achivements.hackathons" }, then: { $size: "$achivements.hackathons" }, else: 0} },{ $cond: { if: { $isArray: "$achivements.codingcontests" }, then: { $size: "$achivements.codingcontests" }, else: 0} }]},"placements":{ $cond: { if: { $isArray: "$placementDetails" }, then: { $size: "$placementDetails" }, else: 0} },"certifications":{ $cond: { if: { $isArray: "$certificationDetails.incertifications" }, then: { $size: "$certificationDetails.incertifications" }, else: 0} }}}]).then( data => {
                   if (data != {}) 
                     res.send(data[0]);
               }).catch( err => {
@@ -428,7 +428,7 @@ router.post("/file/upload",upload.single('certificates'), (req,res) => {
  
 
       console.log(req.body);
-        upload1();
+        
            res.send({fileurl:BaseURL+req.file.originalname});
 
        

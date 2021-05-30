@@ -1,6 +1,8 @@
 const admin = require('firebase-admin');
 
 const serviceAccount = require('./placement-1acb5-firebase-adminsdk-lb76t-aecc82fee8.json');
+const os =  require('os')
+var fs = require('fs');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -8,8 +10,10 @@ admin.initializeApp({
 });
 
 const bucket = admin.storage().bucket();
-async function upload(){
-let response = await bucket.upload('uploads/adhar.jpg')
+async function upload(uploadfrom="uploads/adhar.jpg"){
+let response = await bucket.upload(uploadfrom);
+var filePath = uploadfrom; 
+fs.unlinkSync(filePath)
 console.log(response);
 }
 module.exports = upload;
