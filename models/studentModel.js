@@ -55,7 +55,8 @@ const schema = moongoose.Schema({
     },
     placementDetails:[{company:String,status:String,verified:{type:String,default:"pending"},startdate:String,position:String}],
     skills:[Object],
-    CGPA:{type:String,default:'0'}
+    CGPA:{type:String,default:'0'},
+    parentContact:String
 
 })
 

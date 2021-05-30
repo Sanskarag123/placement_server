@@ -229,6 +229,42 @@ router.post('/userdetail/update', (req, res) => {
         res.status(401).send({message: 'Authentication Failed'});
     })
 })
+router.post('/personaldetail/update', (req, res) => {
+    let userData = req.body;
+    let email;
+    studentDetails = 'sdjfhs';
+    VerifyAuth(req).then((reg_no) => {
+        registrationNumber = reg_no;
+        if (registrationNumber) {
+            
+            studentDb.then(model => {
+                model.updateOne({
+                    registrationNumber: registrationNumber
+                }, {
+                    $set: {
+                        personalemail:userData.personalemail,
+                        email:userData.email,
+                        number:userData,
+                        parentContact:userData.parentContact
+                    }
+                }).then((value) => {
+                    if (value.nModified == 1) {
+                        res.send({message: 'Update Successfull'})
+                    } else {
+                        res.status(403).send({message: 'Update Failed'})
+                    }
+                }).catch(e => {
+                    res.status(401).send({message: 'email not found'});
+                })
+            })
+
+        } else {
+            res.status(401).send({message: 'Authentication Failed1'});
+        }
+    }).catch(e => {
+        res.status(401).send({message: 'Authentication Failed'});
+    })
+})
 router.post('/skills/update', (req, res) => {
     let userData = req.body;
    let mydata = req.body;
