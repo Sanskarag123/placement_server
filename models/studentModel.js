@@ -57,7 +57,10 @@ const schema = moongoose.Schema({
     skills:[Object],
     CGPA:{type:String,default:'0'},
     parentContact:String,
-    photograph:String
+    photograph:String,
+    github:{type:String,default:""},
+    linkedin:{type:String,default:""},
+    portfolio:{type:String,default:""}
 
 })
 

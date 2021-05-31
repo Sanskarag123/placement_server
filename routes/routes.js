@@ -236,6 +236,7 @@ router.post('/personaldetail/update', (req, res) => {
     studentDetails = 'sdjfhs';
     VerifyAuth(req).then((reg_no) => {
         registrationNumber = reg_no;
+        console.log(userData);
         if (registrationNumber) {
             
             studentDb.then(model => {
@@ -245,7 +246,7 @@ router.post('/personaldetail/update', (req, res) => {
                     $set: {
                         personalemail:userData.personalemail,
                         email:userData.email,
-                        number:userData,
+                        number:userData.number,
                         parentContact:userData.parentContact
                     }
                 }).then((value) => {
