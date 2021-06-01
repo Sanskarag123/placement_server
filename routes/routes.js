@@ -620,6 +620,37 @@ router.post("/file/upload",upload.single(), (req,res) => {
             res.status(401).send({message: 'Authentication Failed'});
         })
     })
+      router.post('/cgpa/update', (req, res) => {
+        let userData = req.body;
+        VerifyAuth(req).then((reg_no) => {
+            registrationNumber = reg_no;
+            if (registrationNumber) {
+                console.log(userData)
+                studentDb.then(model => {
+                    console.log(userData,'yo')
+                    model.updateOne({
+                        registrationNumber: registrationNumber
+                    }, {
+                        CGPA:userData.cgpa
+                    }).then((value) => {
+                        console.log(value);
+                        if (value.nModified == 1) {
+                            res.send({message: 'Update Successfull'})
+                        } else {
+                            res.status(403).send({message: 'Update Failed'})
+                        }
+                    }).catch(e => {
+                        res.status(401).send({message: 'email not found'});
+                    })
+                })
+    
+            } else {
+                res.status(401).send({message: 'Authentication Failed1'});
+            }
+        }).catch(e => {
+            res.status(401).send({message: 'Authentication Failed'});
+        })
+    })
        router.post('/internships/add', (req, res) => {
         let userData = req.body;
         VerifyAuth(req).then((reg_no) => {
