@@ -267,6 +267,42 @@ router.post('/personaldetail/update', (req, res) => {
         res.status(401).send({message: 'Authentication Failed'});
     })
 })
+router.post('/placement/update', (req, res) => {
+    let userData = req.body;
+    let email;
+    studentDetails = 'sdjfhs';
+    VerifyAuth(req).then((reg_no) => {
+        registrationNumber = reg_no;
+        console.log(userData);
+        if (registrationNumber) {
+            
+            studentDb.then(model => {
+                model.updateOne({
+                    registrationNumber:registrationNumber,
+                    "placementDetails._id":userData.id
+                }, {
+                    $set: {
+                       "placementDetails.$.status":userData.status
+                    }
+                }).then((value) => {
+                    if (value.nModified == 1) {
+                        res.send({message: 'Update Successfull'})
+                    } else {
+                        res.status(403).send({message: 'Update Failed'})
+                    }
+                }).catch(e => {
+                    console.log(e);
+                    res.status(401).send({message: 'email not found'});
+                })
+            })
+
+        } else {
+            res.status(401).send({message: 'Authentication Failed1'});
+        }
+    }).catch(e => {
+        res.status(401).send({message: 'Authentication Failed'});
+    })
+})
 router.post('/skills/update', (req, res) => {
     let userData = req.body;
    let mydata = req.body;
@@ -1236,7 +1272,7 @@ router.post("/collegesem4/get", (req,res) => {
 })
 router.post("/placement/get", (req,res) => {
     studentDb.then(model => {
-      model.find({facultyId:req.body.facultyId,'placementDetails$.verified':""},{placementDetails:1}).then( data => {
+       model.aggregate([{$match:{facultyId:req.body.facultyId}},{$project:{name:1,registrationNumber:1,placementDetails:{$filter:{input:"$placementDetails",as:"coll",cond:{$eq:['$$coll.verified',"pending"]}}}}}]).then( data => {
           if (data != {}) 
             res.send(data);
       }).catch( err => {
@@ -1280,7 +1316,7 @@ router.post("/college/get", (req,res) => {
 router.post("/placement/verify", (req,res) => {
     
             studentDb.then(model => {
-              model.updateOne({facultyId:req.body.facultyId,registrationNumber:req.body.reg,'placementDetails.name':req.body.company},{'placementDetails.$.verified':req.body.response}).then( data => {
+              model.updateOne({facultyId:req.body.facultyId,registrationNumber:req.body.reg,'placementDetails.company':req.body.company},{'placementDetails.$.verified':req.body.response}).then( data => {
                   if(data.nModified == 1)
                   res.send({message:"Update Successfull"})
               }).catch( err => {
