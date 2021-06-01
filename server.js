@@ -17,7 +17,7 @@ app.use(
         extended: false
     })
 )
-app.use('/', express.static('dist/Placement-portal'));
+app.use('/', express.static('portal'));
 app.use('/files',express.static('uploads'));
 
 
