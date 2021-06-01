@@ -106,7 +106,7 @@ router.post('/students/register', (req, res) => {
                                     }).catch(err => {
                                     })
                                 }).catch((err) => {
-                                    console.log(err);
+                                    console.log(err.message);
                                     res.status(500).send({message: 'Register Fail'})
                                 })
                             })
@@ -135,7 +135,7 @@ router.get('/verifyemail/:token', (req, res) => {
                
                model.updateOne({registrationNumber:check.registrationNumber},{$set:{verified:true}}).then( modify => {
                     if(modify.nModified == 1 || modify.n== 1) {
-                        res.redirect('http://localhost:3000');
+                        res.redirect('https://metier-v2.vercel.app');
                          res.send({message:'verified'})
                     } else {
                          res.status(403).send({message:'Not verified'})
@@ -292,7 +292,8 @@ router.post('/placement/update', (req, res) => {
                     }
                 }).catch(e => {
                     console.log(e);
-                    res.status(401).send({message: 'email not found'});
+                    
+                    res.status().send({message: 'email not found'});
                 })
             })
 
@@ -375,7 +376,7 @@ router.get("/userdetail/get", (req,res) => {
         
         if (registrationNumber) {
             studentDb.then(model => {
-              model.aggregate([{$match:{registrationNumber:registrationNumber}},{$project:{name:1,registrationNumber:1,number:1,CGPA:1,profile_url:1,parentContact:1,dob:1,section:1,faculty:1,specilization:1,gender:1,dept:1,email:1,"internships":{$size:"$certificationDetails.internships"},CGPA:1,arrears:1,gender:1,photograph:1,personalemail:1,achivements:{$sum:[ { $cond: { if: { $isArray: "$achivements.project" }, then: { $size: "$achivements.project" }, else: 0} },{ $cond: { if: { $isArray: "$achivements.hackathons" }, then: { $size: "$achivements.hackathons" }, else: 0} },{ $cond: { if: { $isArray: "$achivements.codingcontests" }, then: { $size: "$achivements.codingcontests" }, else: 0} }]},"placements":{ $cond: { if: { $isArray: "$placementDetails" }, then: { $size: "$placementDetails" }, else: 0} },"certifications":{ $cond: { if: { $isArray: "$certificationDetails.incertifications" }, then: { $size: "$certificationDetails.incertifications" }, else: 0} }}}]).then( data => {
+              model.aggregate([{$match:{registrationNumber:registrationNumber}},{$project:{name:1,registrationNumber:1,number:1,github:1,linkedin:1,portfolio:1,CGPA:1,profile_url:1,parentContact:1,dob:1,section:1,faculty:1,specilization:1,gender:1,dept:1,email:1,"internships":{$size:"$certificationDetails.internships"},CGPA:1,arrears:1,gender:1,photograph:1,personalemail:1,achivements:{$sum:[ { $cond: { if: { $isArray: "$achivements.project" }, then: { $size: "$achivements.project" }, else: 0} },{ $cond: { if: { $isArray: "$achivements.hackathons" }, then: { $size: "$achivements.hackathons" }, else: 0} },{ $cond: { if: { $isArray: "$achivements.codingcontests" }, then: { $size: "$achivements.codingcontests" }, else: 0} }]},"placements":{ $cond: { if: { $isArray: "$placementDetails" }, then: { $size: "$placementDetails" }, else: 0} },"certifications":{ $cond: { if: { $isArray: "$certificationDetails.incertifications" }, then: { $size: "$certificationDetails.incertifications" }, else: 0} }}}]).then( data => {
                   if (data != {}) 
                     res.send(data[0]);
               }).catch( err => {
@@ -1121,7 +1122,7 @@ router.post("/facultystudent/get/:type", (req,res) => {
             
             if(att=='CGPA'){
             studentDb.then(model => {
-              model.aggregate([{$match:{facultyId:req.body.facultyId,verified:true}},{$project:{name:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1}},{$sort:{CGPA:order}}]).then( data => {
+              model.aggregate([{$match:{facultyId:req.body.facultyId,verified:true}},{$project:{name:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1,photograph:1}},{$sort:{CGPA:order}}]).then( data => {
                   if (data != {}) 
                     res.send(data);
               }).catch( err => {
@@ -1130,7 +1131,7 @@ router.post("/facultystudent/get/:type", (req,res) => {
             })}
             if(att=='X'){
                 studentDb.then(model => {
-              model.aggregate([{$match:{facultyId:req.body.facultyId,verified:true}},{$project:{name:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1}},{$sort:{X:order}}]).then( data => {
+              model.aggregate([{$match:{facultyId:req.body.facultyId,verified:true}},{$project:{name:1,photograph:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1}},{$sort:{X:order}}]).then( data => {
                   if (data != {}) 
                     res.send(data);
               }).catch( err => {
@@ -1140,7 +1141,7 @@ router.post("/facultystudent/get/:type", (req,res) => {
             }
             if(att=='XII'){
                 studentDb.then(model => {
-              model.aggregate([{$match:{facultyId:req.body.facultyId,verified:true}},{$project:{name:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1}},{$sort:{XII:order}}]).then( data => {
+              model.aggregate([{$match:{facultyId:req.body.facultyId,verified:true}},{$project:{name:1,photograph:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1}},{$sort:{XII:order}}]).then( data => {
                   if (data != {}) 
                     res.send(data);
               }).catch( err => {
@@ -1150,7 +1151,7 @@ router.post("/facultystudent/get/:type", (req,res) => {
             }
             if(att=='male'){
                 studentDb.then(model => {
-              model.aggregate([{$match:{facultyId:req.body.facultyId,verified:true,gender:'male'}},{$project:{name:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1}},{$sort:{X:order}}]).then( data => {
+              model.aggregate([{$match:{facultyId:req.body.facultyId,verified:true,gender:'male'}},{$project:{name:1,photograph:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1}},{$sort:{X:order}}]).then( data => {
                   if (data != {}) 
                     res.send(data);
               }).catch( err => {
@@ -1160,7 +1161,7 @@ router.post("/facultystudent/get/:type", (req,res) => {
             }
              if(att=='female'){
                 studentDb.then(model => {
-              model.aggregate([{$match:{facultyId:req.body.facultyId,verified:true,gender:'female'}},{$project:{name:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1}},{$sort:{X:order}}]).then( data => {
+              model.aggregate([{$match:{facultyId:req.body.facultyId,verified:true,gender:'female'}},{$project:{name:1,photograph:1,registrationNumber:1,"X":"$educationDetails.school.X.percentage","XII":"$educationDetails.school.XII.percentage",CGPA:1,arrears:1,gender:1}},{$sort:{X:order}}]).then( data => {
                   if (data != {}) 
                     res.send(data);
               }).catch( err => {
